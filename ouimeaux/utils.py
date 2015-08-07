@@ -40,6 +40,7 @@ def get_timesync():
 
 def get_ip_address():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     try:
         s.connect(('1.2.3.4', 9))
         return s.getsockname()[0]
@@ -81,7 +82,7 @@ def retry_with_delay(f, delay=60):
             except (requests.ConnectionError, requests.Timeout):
                 if not remaining:
                     raise
-                gevent.sleep(delay)
+                gevent.sleep(delay*(get_retries()-remaining))
     return inner
 
 
